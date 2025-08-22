@@ -1,0 +1,11 @@
+---
+install_pckgs_dnf:
+  - python3
+  - python3-pip
+  - git
+  - mariadb105-server
+
+install_pckgs_pip:
+  - Flask
+  - mysql-connector-python
+  - PyMySQL

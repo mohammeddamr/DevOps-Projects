@@ -1,0 +1,72 @@
+- name: update the exist pckgs 
+  become: true
+  hosts: web
+  tasks:
+    - name: update the pckgs with dnf
+      dnf:
+        name: "*"
+        state: latest
+
+- name: install the needed pckgs from the vars_files
+  hosts: web
+  become: true
+  vars_files: var.yml
+  tasks:  
+    - name: installing by dnf
+      dnf:
+        name: "{{item}}"
+        state: latest
+      loop: "{{ install_pckgs_dnf }}"
+
+- name: Install PyMySQL for Ansible MySQL modules
+  hosts: web
+  become: true
+  vars_files: var.yml
+  tasks:
+    - name: install by pip
+      pip:
+        name: "{{item}}"
+      loop: "{{install_pckgs_pip}}"
+
+- name: Copy a directory with its content
+  hosts: web
+  become: true
+  tasks: 
+    - name: copy
+      copy:
+        src: noteapp
+        dest: /home/ec2-user/
+
+- name: enable and start db
+  hosts: web
+  become: true
+  tasks: 
+    - name: start the mariadb and enable it
+      service: 
+        name: mariadb
+        state: started
+        enabled: yes
+
+- name: Create DB and user with privileges
+  hosts: web
+  become: true
+  tasks: 
+    - name: setup the db
+      shell: |
+              mysql -u root -prootpassword <<EOF
+              CREATE DATABASE IF NOT EXISTS notesdb;
+              CREATE USER IF NOT EXISTS 'noteuser'@'localhost' IDENTIFIED BY 'yourpassword';
+              GRANT ALL PRIVILEGES ON notesdb.* TO 'noteuser'@'localhost';
+              FLUSH PRIVILEGES;
+              EOF
+
+
+- name: Start Flask app inside project folder
+  hosts: web
+  become: true
+  tasks: 
+    - name: run the code
+      shell: python3 app.py
+      args:
+          chdir: /home/ec2-user/noteapp
+

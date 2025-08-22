@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>📝 Note Taking App</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>📝 Note Taking App</h1>
+
+        <form method="POST">
+            <textarea name="content" placeholder="Write your note here..." required></textarea>
+            <button type="submit">Add Note</button>
+        </form>
+
+        <h2>🗒️ Your Notes</h2>
+        <ul>
+            {% for note in notes %}
+                <li>{{ note[1] }}</li>
+            {% else %}
+                <li>No notes yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

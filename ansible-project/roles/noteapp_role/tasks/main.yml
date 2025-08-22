@@ -1,0 +1,43 @@
+- name: update the pckgs with dnf
+  dnf:
+        name: "*"
+        state: latest
+
+- name: copy
+  copy:
+        src: noteapp
+        dest: /home/ec2-user/
+
+
+
+- name: installing by dnf
+  dnf:
+        name: "{{item}}"
+        state: latest
+  loop: "{{ install_pckgs_dnf }}"
+
+- name: install by pip
+  pip:
+        name: "{{item}}"
+  loop: "{{install_pckgs_pip}}"
+
+- name: start the mariadb and enable it
+  service: 
+        name: mariadb
+        state: started
+        enabled: yes
+
+- name: setup the db
+  shell: |
+              mysql -u root -prootpassword <<EOF
+              CREATE DATABASE IF NOT EXISTS notesdb;
+              CREATE USER IF NOT EXISTS 'noteuser'@'localhost' IDENTIFIED BY 'yourpassword';
+              GRANT ALL PRIVILEGES ON notesdb.* TO 'noteuser'@'localhost';
+              FLUSH PRIVILEGES;
+              EOF
+
+
+- name: run the code
+  shell: python3 app.py
+  args:
+          chdir: /home/ec2-user/noteapp

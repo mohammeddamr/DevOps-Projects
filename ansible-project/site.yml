@@ -1,0 +1,5 @@
+- name: Deploy Note-Taking Web App
+  hosts: web
+  become: true
+  roles:
+    - noteapp_role
